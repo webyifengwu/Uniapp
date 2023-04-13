@@ -1,4 +1,7 @@
 import App from './App'
+import store from "./store"
+	//引入组件
+	import Search from './components/Search/Search.vue'
 // 按需导入 $http 对象
 import {
   $http
@@ -14,6 +17,13 @@ $http.beforeRequest = function (options) {
   wx.showLoading({
     title: '数据加载中...',
   })
+  if(options.url.indexOf('/my/') !== -1){
+    options.header = {
+      "Authorization" : store.state.loginMsg.token
+    }
+  }else{
+     
+  }
 }
 // 响应拦截器
 // 隐藏 loading 效果
@@ -21,7 +31,14 @@ $http.afterRequest = function () {
   wx.hideLoading()
 }
 
-uni.$showMsg = function(title="数据请求失败",duration=1500,icon="none"){
+uni.$showMsg = function(title="数据请求失败",duration=2500,icon="none"){
+  uni.showToast({
+    title,
+    duration,
+    icon
+  })
+}
+uni.$showError = function(title,duration=2500,icon="error"){
   uni.showToast({
     title,
     duration,
@@ -74,6 +91,8 @@ import {
 } from 'vue'
 export function createApp() {
   const app = createSSRApp(App)
+  app.component("Search",Search)
+  app.use(store)
   return {
     app
   }
